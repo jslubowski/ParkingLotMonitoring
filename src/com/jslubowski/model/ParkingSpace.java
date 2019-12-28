@@ -1,17 +1,15 @@
 package com.jslubowski.model;
 
-import com.jslubowski.dip.Drawing;
-import com.jslubowski.dip.Processing;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
+// TODO Lombok
 public class ParkingSpace {
 
-    // == fields ==
-    private String name;
+    private String parkingSpaceName ;
     private Point cornerTopLeft;
     private Point cornerBottomRight;
     private Mat image;
@@ -19,25 +17,22 @@ public class ParkingSpace {
     private double area;
     private boolean occupied;
 
-    // == constructor ==
-    public ParkingSpace(Point cornerTopLeft, Point cornerBottomRight, Mat image, String name) {
+    public ParkingSpace(Point cornerTopLeft, Point cornerBottomRight, Mat image, String parkingSpaceName) {
         this.cornerTopLeft = cornerTopLeft;
         this.cornerBottomRight = cornerBottomRight;
-        this.name = name;
+        this.parkingSpaceName = parkingSpaceName;
         this.area = (cornerBottomRight.x - cornerTopLeft.x) * (cornerBottomRight.y - cornerTopLeft.y);
-        Rect rectCrop = new Rect(cornerTopLeft, cornerBottomRight);          // crop out the parking spot from the image
+        Rect rectCrop = new Rect(cornerTopLeft, cornerBottomRight);
         this.image = new Mat(image, rectCrop);
         this.imageProcessed = this.image;
     }
-
-    // == methods ==
 
     public boolean checkOccupation(List<Rect> rectangles){
         // Are conditions met?
         return rectangles.size() >= 1;
     }
 
-    // == getters and setters ==
+
     public Point getCornerTopLeft() {
         return cornerTopLeft;
     }
@@ -62,12 +57,12 @@ public class ParkingSpace {
         this.image = image;
     }
 
-    public String getName() {
-        return name;
+    public String getParkingSpaceName() {
+        return parkingSpaceName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setParkingSpaceName(String parkingSpaceName) {
+        this.parkingSpaceName = parkingSpaceName;
     }
 
     public Mat getImageProcessed() {

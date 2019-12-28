@@ -1,6 +1,6 @@
 package com.jslubowski;
 
-import com.jslubowski.dip.Processing;
+import com.jslubowski.dip.ImageProcessor;
 import com.jslubowski.model.ParkingSpace;
 import com.jslubowski.util.MyFileReader;
 import com.jslubowski.util.ParkingSpacesCreator;
@@ -48,23 +48,15 @@ public class Main {
                 String filename = arrImagePath[arrImagePath.length - 1].split("\\.")[0];
                 if(arrImagePath[arrImagePath.length - 1].split("\\.")[1].equals("jpg")) {                        // check if a photo
 
-                    // Main method steps
-                    // 1. Load an image
                     Mat sourceImage = Imgcodecs.imread(imagePath);
-                    Mat outputImage = sourceImage.clone();
 
-                    // 2. Initialize ParkingSpaces points on an image
                     List<ParkingSpace> currentParkingSpaces =
                             ParkingSpacesCreator.createParkingSpaces(spacesCoordinates, sourceImage);
 
-                    // 3. Preprocess all parking spaces and add to currentParkingSpaces list
-                    currentParkingSpaces = Processing.preProcessAll(currentParkingSpaces);
+                    ImageProcessor imageProcessor = new ImageProcessor(currentParkingSpaces, previousParkingSpaces, sourceImage.clone());
+                    imageProcessor.preProcessAllSpaces();
+                    imageProcessor.runAnalysis(projectFilePath, filename, batch);
 
-                    // 4. Run occupation verification
-                    Processing.runAnalysis(previousParkingSpaces, currentParkingSpaces,
-                            outputImage, projectFilePath, filename, batch);
-
-                    // 5. Save current parking spaces as previous and go to next iteration
                     previousParkingSpaces = new ArrayList<>();
                     for(ParkingSpace space: currentParkingSpaces){
                         previousParkingSpaces.add(space);

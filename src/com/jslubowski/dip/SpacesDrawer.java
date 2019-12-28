@@ -7,19 +7,27 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Drawing {
+public class SpacesDrawer {
 
-    public static Mat drawParkingSpace(ParkingSpace p, Mat sourceImage, boolean occupation) {
+    private final static Scalar RED                 = new Scalar(0, 0, 255);
+    private final static Scalar GREEN               = new Scalar(0, 255, 0);
+    private final static int RECTANGLE_THICKNESS    = 1;
+    private final static int TEXT_THICKNESS         = 1;
+    private final static int TEXT_Y_OFFSET          = 10;
+    private final static int TEXT_FONT_SCALE        = 1;
+
+    public static Mat drawParkingSpace(ParkingSpace parkingSpace, Mat sourceImage, boolean occupation) {
         Scalar color;
         if (occupation) {
-            color = new Scalar(0, 0, 255);
+            color = RED;
         } else {
-            color = new Scalar(0, 255, 0);
+            color = GREEN;
         }
-        Imgproc.rectangle(sourceImage, new Rect(p.getCornerTopLeft(), p.getCornerBottomRight()), color, 1);
-        double xTextPoint = p.getCornerTopLeft().x;
-        double yTextPoint = p.getCornerTopLeft().y - 10;
-        Imgproc.putText(sourceImage, p.getName(), new Point(xTextPoint, yTextPoint), Imgproc.FONT_HERSHEY_PLAIN, 1, color, 1);
+        Imgproc.rectangle(sourceImage, new Rect(parkingSpace.getCornerTopLeft(), parkingSpace.getCornerBottomRight()), color, RECTANGLE_THICKNESS);
+        double xTextPoint = parkingSpace.getCornerTopLeft().x;
+        double yTextPoint = parkingSpace.getCornerTopLeft().y - TEXT_Y_OFFSET;
+        Point textPoint = new Point(xTextPoint, yTextPoint);
+        Imgproc.putText(sourceImage, parkingSpace.getParkingSpaceName(), textPoint, Imgproc.FONT_HERSHEY_PLAIN, TEXT_FONT_SCALE, color, TEXT_THICKNESS);
 
         return sourceImage;
     }
@@ -45,11 +53,11 @@ public class Drawing {
     }
 
     public static List<Rect> getRectangles(ParkingSpace parkingSpace){
-        String name = parkingSpace.getName();
+        String name = parkingSpace.getParkingSpaceName();
         double area = parkingSpace.getArea();
         Mat imageProcessed = parkingSpace.getImageProcessed();
-        List<MatOfPoint> contours = Drawing.findContours(imageProcessed);
-        return Drawing.findRectangles(imageProcessed, contours, name, area);
+        List<MatOfPoint> contours = SpacesDrawer.findContours(imageProcessed);
+        return SpacesDrawer.findRectangles(imageProcessed, contours, name, area);
     }
 
 }

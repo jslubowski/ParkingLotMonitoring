@@ -18,9 +18,6 @@ public class Processing {
     private final static Point MORPHOLOGY_POINT                 = new Point(-1, -1);
     private final static int WHITE_PIXEL_DIFFERENCE_THRESHOLD   = 450;
 
-    /*
-     * this is a method to call to prepare an image for further analysis
-     */
 
     public static Mat preProcess(String name, Mat image) {
         Mat edges = new Mat();
@@ -38,9 +35,9 @@ public class Processing {
 
     public static int getWhitePixels(Mat image){
         int whitePixels = 0;
-        for(int j = 0; j < image.rows(); j++){
-            for(int i = 0; i < image.cols(); i++){
-                if(image.get(j,i)[0] == 255.0) whitePixels++;
+        for(int row = 0; row < image.rows(); row++){
+            for(int column = 0; column < image.cols(); column++){
+                if(image.get(row,column)[0] == 255.0) whitePixels++;
             }
         }
         return whitePixels;

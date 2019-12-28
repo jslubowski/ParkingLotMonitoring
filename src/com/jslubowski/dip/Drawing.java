@@ -31,7 +31,7 @@ public class Drawing {
         return contours;
     }
 
-    public static List<Rect> findRectangles(Mat imageProcessed, List<MatOfPoint> contours, String name, int area){
+    public static List<Rect> findRectangles(Mat imageProcessed, List<MatOfPoint> contours, String name, double area){
         List<Rect> retContours = new ArrayList<>();
         Mat rectangles = Mat.zeros(imageProcessed.size(), CvType.CV_8UC3);
         for(MatOfPoint c: contours) {
@@ -46,7 +46,7 @@ public class Drawing {
 
     public static List<Rect> getRectangles(ParkingSpace parkingSpace){
         String name = parkingSpace.getName();
-        int area = parkingSpace.getArea();
+        double area = parkingSpace.getArea();
         Mat imageProcessed = parkingSpace.getImageProcessed();
         List<MatOfPoint> contours = Drawing.findContours(imageProcessed);
         return Drawing.findRectangles(imageProcessed, contours, name, area);

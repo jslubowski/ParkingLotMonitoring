@@ -16,15 +16,15 @@ public class ParkingSpace {
     private Point cornerBottomRight;
     private Mat image;
     private Mat imageProcessed;
-    private int area;
+    private double area;
     private boolean occupied;
 
     // == constructor ==
-    public ParkingSpace(int x1, int y1, int x2, int y2, Mat image, String name) {
-        this.cornerTopLeft = new Point(x1, y1);
-        this.cornerBottomRight = new Point(x2, y2);
+    public ParkingSpace(Point cornerTopLeft, Point cornerBottomRight, Mat image, String name) {
+        this.cornerTopLeft = cornerTopLeft;
+        this.cornerBottomRight = cornerBottomRight;
         this.name = name;
-        this.area = (x2 - x1) * (y2 - y1);
+        this.area = (cornerBottomRight.x - cornerTopLeft.x) * (cornerBottomRight.y - cornerTopLeft.y);
         Rect rectCrop = new Rect(cornerTopLeft, cornerBottomRight);          // crop out the parking spot from the image
         this.image = new Mat(image, rectCrop);
         this.imageProcessed = this.image;
@@ -32,13 +32,9 @@ public class ParkingSpace {
 
     // == methods ==
 
-    /*
-     * this is the main algorithm for detecting empty parking space
-     */
     public boolean checkOccupation(List<Rect> rectangles){
         // Are conditions met?
-        if(rectangles.size() >= 1) return true;
-        else return false;
+        return rectangles.size() >= 1;
     }
 
     // == getters and setters ==
@@ -82,7 +78,7 @@ public class ParkingSpace {
         this.imageProcessed = imageProcessed;
     }
 
-    public int getArea() {
+    public double getArea() {
         return area;
     }
 

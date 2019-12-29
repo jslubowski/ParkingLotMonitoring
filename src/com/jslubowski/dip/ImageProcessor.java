@@ -17,9 +17,10 @@ public class ImageProcessor {
     private final static Point MORPHOLOGY_POINT                 = new Point(-1, -1);
     private final static int WHITE_PIXEL_DIFFERENCE_THRESHOLD   = 450;
     private final static int FIRST_IMAGE_CHANNEL                = 0;
+    private final static boolean USE_L2_GRADIENT                = false;
 
-    private List<ParkingSpace> currentParkingSpaces;
-    private List<ParkingSpace> previousParkingSpaces;
+    private final List<ParkingSpace> currentParkingSpaces;
+    private final List<ParkingSpace> previousParkingSpaces;
     private Mat outputImage;
 
     public ImageProcessor(List<ParkingSpace> currentParkingSpaces, List<ParkingSpace> previousParkingSpaces, Mat outputImage) {
@@ -32,7 +33,9 @@ public class ImageProcessor {
         int whitePixels = 0;
         for(int row = 0; row < image.rows(); row++){
             for(int column = 0; column < image.cols(); column++){
-                if(isPixelWhite(image.get(row, column))) whitePixels++;
+                if(isPixelWhite(image.get(row, column))) {
+                    whitePixels++;
+                }
             }
         }
         return whitePixels;
@@ -44,13 +47,13 @@ public class ImageProcessor {
         Mat morphologyKernel = Mat.ones(3, 3, 1);
 
         Imgproc.GaussianBlur(image, imageProcessed, new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
-        Imgproc.Canny(imageProcessed, edges, THRESHOLD1, THRESHOLD2, KERNEL_SIZE, false);
+        Imgproc.Canny(imageProcessed, edges, THRESHOLD1, THRESHOLD2, KERNEL_SIZE, USE_L2_GRADIENT);
         Imgproc.dilate(edges, edges, morphologyKernel, MORPHOLOGY_POINT, DILATION_ITERATIONS);
         Imgproc.erode(edges, edges, morphologyKernel, MORPHOLOGY_POINT, EROSION_ITERATIONS);
         return edges;
     }
 
-    public void preProcessAllSpaces(){
+    public void preProcessAllCurrentSpaces(){
         this.currentParkingSpaces.forEach(space -> {
             space.setImageProcessed(preProcess(space.getImage()));
         });
@@ -81,26 +84,27 @@ public class ImageProcessor {
         for(int i = 0; i < this.currentParkingSpaces.size(); i++) {
             ParkingSpace currentSpace = this.currentParkingSpaces.get(i);
             ParkingSpace previousSpace = this.previousParkingSpaces.get(i);
-
+            SpacesDrawer spacesDrawer = new SpacesDrawer(currentSpace);
             int whitePixelsDifference = getWhitePixelsDifference(currentSpace.getImageProcessed(), previousSpace.getImageProcessed());
+
             if(whitePixelsDifference > WHITE_PIXEL_DIFFERENCE_THRESHOLD){
-                List<Rect> rectangles = SpacesDrawer.getRectangles(currentSpace);
+                List<Rect> rectangles = spacesDrawer.getRectangles();
                 currentSpace.setOccupied(currentSpace.checkOccupation(rectangles));
-                this.outputImage = SpacesDrawer.drawParkingSpace(currentSpace, this.outputImage, currentSpace.isOccupied());
+                this.outputImage = spacesDrawer.drawParkingSpace(this.outputImage, currentSpace.isOccupied());
             } else {
                 currentSpace.setOccupied(previousSpace.isOccupied());
-                this.outputImage = SpacesDrawer.drawParkingSpace(currentSpace, this.outputImage, currentSpace.isOccupied());
+                this.outputImage = spacesDrawer.drawParkingSpace(this.outputImage, currentSpace.isOccupied());
             }
         }
     }
 
     private void processFirstPhoto(){
-        for (ParkingSpace p : this.currentParkingSpaces) {
-            List<Rect> rectangles = SpacesDrawer.getRectangles(p);
-            p.setOccupied(p.checkOccupation(rectangles));
-            this.outputImage = SpacesDrawer.drawParkingSpace(p, this.outputImage, p.isOccupied());
+        for (ParkingSpace parkingSpace : this.currentParkingSpaces) {
+            SpacesDrawer spacesDrawer = new SpacesDrawer(parkingSpace);
+            List<Rect> rectangles = spacesDrawer.getRectangles();
+            parkingSpace.setOccupied(parkingSpace.checkOccupation(rectangles));
+            this.outputImage = spacesDrawer.drawParkingSpace(this.outputImage, parkingSpace.isOccupied());
         }
     }
-
 }
 

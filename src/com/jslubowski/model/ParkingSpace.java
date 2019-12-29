@@ -9,12 +9,12 @@ import java.util.List;
 // TODO Lombok
 public class ParkingSpace {
 
-    private String parkingSpaceName ;
-    private Point cornerTopLeft;
-    private Point cornerBottomRight;
-    private Mat image;
+    private final String parkingSpaceName ;
+    private final Point cornerTopLeft;
+    private final Point cornerBottomRight;
+    private final Mat image;
     private Mat imageProcessed;
-    private double area;
+    private final double area;
     private boolean occupied;
 
     public ParkingSpace(Point cornerTopLeft, Point cornerBottomRight, Mat image, String parkingSpaceName) {
@@ -28,7 +28,6 @@ public class ParkingSpace {
     }
 
     public boolean checkOccupation(List<Rect> rectangles){
-        // Are conditions met?
         return rectangles.size() >= 1;
     }
 
@@ -37,32 +36,16 @@ public class ParkingSpace {
         return cornerTopLeft;
     }
 
-    public void setCornerTopLeft(Point cornerTopLeft) {
-        this.cornerTopLeft = cornerTopLeft;
-    }
-
     public Point getCornerBottomRight() {
         return cornerBottomRight;
-    }
-
-    public void setCornerBottomRight(Point cornerBottomRight) {
-        this.cornerBottomRight = cornerBottomRight;
     }
 
     public Mat getImage() {
         return image;
     }
 
-    public void setImage(Mat image) {
-        this.image = image;
-    }
-
     public String getParkingSpaceName() {
         return parkingSpaceName;
-    }
-
-    public void setParkingSpaceName(String parkingSpaceName) {
-        this.parkingSpaceName = parkingSpaceName;
     }
 
     public Mat getImageProcessed() {
@@ -75,10 +58,6 @@ public class ParkingSpace {
 
     public double getArea() {
         return area;
-    }
-
-    public void setArea(int area) {
-        this.area = area;
     }
 
     public boolean isOccupied() {

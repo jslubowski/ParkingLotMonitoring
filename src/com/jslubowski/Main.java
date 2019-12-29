@@ -54,7 +54,7 @@ public class Main {
                             ParkingSpacesCreator.createParkingSpaces(spacesCoordinates, sourceImage);
 
                     ImageProcessor imageProcessor = new ImageProcessor(currentParkingSpaces, previousParkingSpaces, sourceImage.clone());
-                    imageProcessor.preProcessAllSpaces();
+                    imageProcessor.preProcessAllCurrentSpaces();
                     imageProcessor.runAnalysis(projectFilePath, filename, batch);
 
                     previousParkingSpaces = new ArrayList<>();

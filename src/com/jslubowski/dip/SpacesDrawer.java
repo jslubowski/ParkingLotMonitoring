@@ -16,7 +16,17 @@ public class SpacesDrawer {
     private final static int TEXT_Y_OFFSET          = 10;
     private final static int TEXT_FONT_SCALE        = 1;
 
-    public static Mat drawParkingSpace(ParkingSpace parkingSpace, Mat sourceImage, boolean occupation) {
+    private final ParkingSpace parkingSpace;
+    private final List<MatOfPoint> contours;
+    private final List<Rect> rectangles;
+
+    public SpacesDrawer(ParkingSpace parkingSpace) {
+        this.parkingSpace = parkingSpace;
+        this.contours = findContours(parkingSpace.getImageProcessed());
+        this.rectangles = findRectangles(parkingSpace.getImageProcessed(), parkingSpace.getParkingSpaceName(), parkingSpace.getArea());
+    }
+
+    public Mat drawParkingSpace(Mat sourceImage, boolean occupation) {
         Scalar color;
         if (occupation) {
             color = RED;
@@ -32,32 +42,31 @@ public class SpacesDrawer {
         return sourceImage;
     }
 
-   public static List<MatOfPoint> findContours(Mat imageProcessed){
+   private List<MatOfPoint> findContours(Mat imageProcessed){
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(imageProcessed, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         return contours;
     }
 
-    public static List<Rect> findRectangles(Mat imageProcessed, List<MatOfPoint> contours, String name, double area){
+    private List<Rect> findRectangles(Mat imageProcessed, String name, double area){
         List<Rect> retContours = new ArrayList<>();
         Mat rectangles = Mat.zeros(imageProcessed.size(), CvType.CV_8UC3);
         for(MatOfPoint c: contours) {
-            Rect rect = Imgproc.boundingRect(c);
-            if((rect.area() > (area / 6)) || (name == "P1" && rect.area() > area / 3) ) {
-                Imgproc.rectangle(rectangles, rect, new Scalar(0, 255, 0), 1);
-                retContours.add(rect);
+            Rect parkingSpaceRect = Imgproc.boundingRect(c);
+            if(isSpaceOccupied(area, name, parkingSpaceRect)) {
+                Imgproc.rectangle(rectangles, parkingSpaceRect, GREEN, RECTANGLE_THICKNESS);
+                retContours.add(parkingSpaceRect);
             }
         }
         return retContours;
     }
 
-    public static List<Rect> getRectangles(ParkingSpace parkingSpace){
-        String name = parkingSpace.getParkingSpaceName();
-        double area = parkingSpace.getArea();
-        Mat imageProcessed = parkingSpace.getImageProcessed();
-        List<MatOfPoint> contours = SpacesDrawer.findContours(imageProcessed);
-        return SpacesDrawer.findRectangles(imageProcessed, contours, name, area);
+    public List<Rect> getRectangles(){
+        return this.rectangles;
     }
 
+    private boolean isSpaceOccupied(double area, String name, Rect parkingSpaceRect){
+        return (parkingSpaceRect.area() > (area / 6)) || (name.equals("P1") && (parkingSpaceRect.area() > area / 3));
+    }
 }

@@ -16,18 +16,20 @@ import java.util.stream.Stream;
 public class MyFileReader {
     private final static String FILENAME = "\\spaces.txt";
 
-    private String projectFilePath;
+    private final String projectFilePath;
 
     public MyFileReader(String projectFilePath) {
         this.projectFilePath = projectFilePath + "input\\";
     }
 
     public List<String> readAllFilesInDirectory(String batchFolder) throws IOException {
-        try (Stream<Path> walk = Files.walk(Paths.get(this.projectFilePath + batchFolder))) {
+        try (Stream<Path> walk = Files.walk(Paths.get(this.projectFilePath + batchFolder)))
+        {
             List<String> imagesPaths = walk.filter(Files::isRegularFile)
                     .map(x -> x.toString()).collect(Collectors.toList());
             return imagesPaths;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("Error while reading " + batchFolder + " folder.");
             throw e;
         }
@@ -36,11 +38,13 @@ public class MyFileReader {
     public List<Integer> findAllSpaceCoordinates(String batchFolder) throws IOException {
         List<Integer> spacesCoordinates = new ArrayList<>();
         try (FileInputStream inputTextFile = new FileInputStream(this.projectFilePath + batchFolder + FILENAME);
-            Scanner scanner = new Scanner(inputTextFile)) {
+             Scanner scanner = new Scanner(inputTextFile))
+        {
             while (scanner.hasNextInt()) {
                 spacesCoordinates.add(scanner.nextInt());
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("IOException :" + e.getMessage());
             throw e;
         }
@@ -52,5 +56,4 @@ public class MyFileReader {
         String[] batches = file.list((File dir, String name)-> new File(dir, name).isDirectory());
         return batches;
     }
-
 }
